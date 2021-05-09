@@ -307,74 +307,7 @@ def loss_PU_cosine_triplet_1vA_CustomRate__3(num_in_batch,weight_PN_loss=0.5,Tri
         return loss/total_anchor
     return loss_function
 
-"""
-nDim = K.int_shape(y_pred)[-1]
-#普通にshapeとり出しているだけ。
-#問題は、y_predの次元が(200,100)とかになっている。
-#nDim=100
-y_pred = K.reshape(y_pred,(-1,nDim))
-#結局、(200,100)みたいな形にしている。
-y_true = K.flatten(y_true)
 
-class_mask = []
-class_pred = []
-for c in range(num_class):
-    class_mask.append(K.equal(y_true,c))
-    class_pred.append(tf.boolean_mask(y_pred, class_mask[c]))
-
-unlabel_mask = K.equal(y_true, -1)
-unlabel_pred = tf.boolean_mask(y_pred, unlabel_mask)
-
-loss = 0
-total_anchor = 0
-for c in range(num_class):
-    #全てのクラスについて計算する。
-    #for p in range(num_samples[c]):
-    for p in range(1):
-        total_anchor += 1
-
-        #loss_PU
-        anchor = class_pred[c][p:p+1,:]
-        #クラスの中の最初の1こ目
-        except_positive_pred = K.concatenate([class_pred[c][:p,:],class_pred[c][p+1:,:]],axis = 0)
-        #二つのベクトルを合体させてるだけ
-        P_sim = cos_sim(anchor, except_positive_pred)
-        #これは、positive同士で、内積をとっている。コサイン距離。
-
-        #ここからは、教師ありの部分のloss計算
-        other_pred = None
-        num_other = 0
-        for cc in range(num_class):
-            if cc == c:
-                continue
-                #これは上で考えた。
-            if other_pred is None:
-                other_pred = class_pred[cc]
-            else:
-                other_pred = K.concatenate([other_pred, class_pred[cc]], axis = 0)
-            num_other += num_samples[cc]
-
-        #loss_N
-        N_sim = cos_sim(anchor, other_pred)
-        P_to_N = K.tile(P_sim, (1, num_other))
-        N_to_P = K.tile(N_sim, (1, num_samples[c]-1))
-        N_to_P = K.transpose(N_to_P)
-
-        loss_supervised = K.mean(triplet_loss_from_cosine(P_to_N, N_to_P, Triplet_Margin))
-
-        loss += loss_supervised
-
-
-        #ここからは、教師なしの部分のloss計算
-        if num_unlabel > 0:
-            U_sim = cos_sim(anchor, unlabel_pred)
-
-            sim_ap = K.mean(P_sim)
-            sim_au = K.mean(U_sim)
-            sim_an = K.mean(N_sim)
-
-            loss += K.abs(sim_au - class_rate[c] * sim_ap - (1.0 - class_rate[c]) * sim_an)
-"""
 
 
 
